@@ -8,6 +8,8 @@ const dices = {
     2: {0: 'Hit ALL', 1: 'Don\'t hit WHITE', 2: 'Hit WHITE'},   // white dice
 };
 
+const Collection_Ids = [445, 548];
+
 module.exports = function DWGuide(mod) {
     let boss = null;
     let ball = null;
@@ -15,6 +17,7 @@ module.exports = function DWGuide(mod) {
     let orbit = 0; // 0: STOP, 1:clockwise, 2:counter-clockwise
     let count = 0;
     let circlecount = 0;
+    let flowerId = 999999999;
 
     mod.command.add('dw', {
         $default() {
@@ -39,6 +42,44 @@ module.exports = function DWGuide(mod) {
                 name: mod.options.niceName,
                 message: msg,
             });
+        }
+    }
+
+    function SpawnFlower(position, despawnDelay, collectionId){       
+        mod.send('S_SPAWN_COLLECTION', 4, {
+            gameId: flowerId,
+            id: collectionId,
+            amount: 1,
+            loc: {x: position.x, y: position.y, z: bossLoc.z},
+            w: 0,
+            extractor: false,
+            extractorDisabled: false,
+            extractorDisabledTime: 0
+        });
+        setTimeout(DespawnFlower, despawnDelay, flowerId)
+        flowerId--;
+    }
+    
+    function DespawnFlower(id){
+        mod.send('S_DESPAWN_COLLECTION', 2, {
+            gameId: id,
+            collected: false
+        });
+    }
+    
+    function SpawnLoc(degrees, radius) {
+        let rads = (degrees * Math.PI/180);
+        let finalrad = bossLoc.w - rads;
+        
+        let spawnx = bossLoc.x + radius * Math.cos(finalrad);
+        let spawny = bossLoc.y + radius * Math.sin(finalrad);
+        return {x:spawnx,y:spawny};
+    }
+    
+    // Darkan
+    function DarkanInOutRange() {
+        for (let degree = 0; degree < 360; degree += 360 / 20) {
+            SpawnFlower(SpawnLoc(degree,300), 6000, Collection_Ids[0]);
         }
     }
 
@@ -115,11 +156,17 @@ module.exports = function DWGuide(mod) {
 
                     case 1311: // Blue Outer-inner explosion
                     case 1314: // Red Outer-inner explosion
+                        bossLoc = event.loc;
+                        bossLoc.w = event.w;
+                        DarkanInOutRange();
                         sendMessage('IN then OUT');
                         break;
 
                     case 1312: // Red Inner-outer explosion
                     case 1313: // Blue Inner-outer explosion
+                        bossLoc = event.loc;
+                        bossLoc.w = event.w;
+                        DarkanInOutRange();
                         sendMessage('OUT then IN');
                         break;
 
