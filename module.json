@@ -1,13 +1,12 @@
 {
+    "disableAutoUpdate": false,
     "name": "dw-guide",
-    "author": "Caali / YunfeiG",
+    "author": "edu / Caali / YunfeiG",
     "description": "Guide module for Demon's Wheel",
-    "version": "1.0",
     "options": {
-        "niceName": "Demon's Wheel Guide",
+        "niceName": "DWGuide",
         "settingsVersion": 1,
-        "settingsFile": "config.json",
-        "settingsMigrator": "settings_migrator.js"
+        "settingsFile": "config.json"
     },
-    "servers": ["https://raw.githubusercontent.com/tera-toolbox-mods/dw-guide/master/"]
+    "servers": ["https://raw.githubusercontent.com/eduedp/dw-guide/master/"]
 }
